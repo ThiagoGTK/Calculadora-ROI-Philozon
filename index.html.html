@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora ROI — Philozon</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue: #0044CC;
+    --blue-light: #2266EE;
+    --blue-pale: #E8F0FF;
+    --teal: #00B8A9;
+    --teal-light: #E0F7F5;
+    --gold: #F5A623;
+    --gold-light: #FFF4E0;
+    --dark: #0A0F1E;
+    --mid: #3A4260;
+    --muted: #8892B0;
+    --surface: #F7F9FF;
+    --white: #FFFFFF;
+    --border: #D6DFFF;
+    --radius: 16px;
+    --shadow: 0 4px 32px rgba(0,68,204,0.10);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--surface);
+    color: var(--dark);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--dark);
+    padding: 28px 40px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 220px; height: 220px;
+    background: radial-gradient(circle, rgba(0,184,169,0.25) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .logo-mark {
+    width: 44px; height: 44px;
+    background: linear-gradient(135deg, var(--teal), var(--blue));
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Serif Display', serif;
+    color: white;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  header h1 {
+    font-family: 'DM Serif Display', serif;
+    color: white;
+    font-size: 22px;
+    font-weight: 400;
+    letter-spacing: -0.3px;
+  }
+  header p {
+    color: rgba(255,255,255,0.5);
+    font-size: 13px;
+    margin-top: 2px;
+  }
+  .badge {
+    margin-left: auto;
+    background: rgba(0,184,169,0.18);
+    border: 1px solid rgba(0,184,169,0.35);
+    color: var(--teal);
+    border-radius: 40px;
+    padding: 5px 14px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+  }
+
+  /* LAYOUT */
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 24px 60px;
+  }
+
+  /* ÁREA DE ATUAÇÃO */
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+
+  .area-selector {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 36px;
+  }
+  .area-btn {
+    padding: 9px 18px;
+    border-radius: 40px;
+    border: 1.5px solid var(--border);
+    background: white;
+    color: var(--mid);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.18s;
+  }
+  .area-btn:hover {
+    border-color: var(--blue);
+    color: var(--blue);
+  }
+  .area-btn.active {
+    background: var(--blue);
+    border-color: var(--blue);
+    color: white;
+    box-shadow: 0 3px 14px rgba(0,68,204,0.22);
+  }
+
+  /* GRID */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 24px;
+  }
+  @media (max-width: 700px) {
+    .grid-2 { grid-template-columns: 1fr; }
+  }
+
+  /* CARDS */
+  .card {
+    background: white;
+    border-radius: var(--radius);
+    border: 1.5px solid var(--border);
+    padding: 28px;
+    box-shadow: var(--shadow);
+  }
+  .card h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--dark);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-desc {
+    color: var(--muted);
+    font-size: 13px;
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+
+  /* INPUTS */
+  .field {
+    margin-bottom: 18px;
+  }
+  .field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--mid);
+    letter-spacing: 0.3px;
+    margin-bottom: 6px;
+  }
+  .field-row {
+    position: relative;
+  }
+  .field-prefix {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 14px;
+    color: var(--muted);
+    font-weight: 500;
+    pointer-events: none;
+  }
+  input[type=number], input[type=text], select {
+    width: 100%;
+    padding: 11px 14px 11px 36px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    color: var(--dark);
+    background: var(--surface);
+    outline: none;
+    transition: border-color 0.16s, box-shadow 0.16s;
+    -moz-appearance: textfield;
+  }
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button { -webkit-appearance: none; }
+  input.no-prefix, select { padding-left: 14px; }
+  input:focus, select:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(0,68,204,0.10);
+    background: white;
+  }
+  select { cursor: pointer; }
+
+  /* DIVIDER */
+  .divider {
+    border: none;
+    border-top: 1.5px solid var(--border);
+    margin: 20px 0;
+  }
+
+  /* TOGGLE */
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding: 14px;
+    border-radius: 10px;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+  }
+  .toggle-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--mid);
+    flex: 1;
+  }
+  .toggle {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    flex-shrink: 0;
+  }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .slider {
+    position: absolute;
+    inset: 0;
+    background: var(--border);
+    border-radius: 24px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .slider::before {
+    content: '';
+    position: absolute;
+    left: 3px; top: 3px;
+    width: 18px; height: 18px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.2s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+  }
+  input:checked + .slider { background: var(--blue); }
+  input:checked + .slider::before { transform: translateX(20px); }
+
+  /* RESULTS */
+  .results-card {
+    background: linear-gradient(135deg, var(--dark) 0%, #1a2240 100%);
+    border-radius: var(--radius);
+    border: 1.5px solid rgba(255,255,255,0.08);
+    padding: 36px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.22);
+  }
+  .results-card h2 {
+    font-family: 'DM Serif Display', serif;
+    color: white;
+    font-size: 20px;
+    font-weight: 400;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  @media (max-width: 500px) {
+    .metrics-grid { grid-template-columns: 1fr; }
+  }
+
+  .metric {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 12px;
+    padding: 18px 20px;
+  }
+  .metric.highlight {
+    background: rgba(0,184,169,0.14);
+    border-color: rgba(0,184,169,0.30);
+  }
+  .metric.highlight-gold {
+    background: rgba(245,166,35,0.12);
+    border-color: rgba(245,166,35,0.28);
+  }
+  .metric-label {
+    font-size: 11px;
+    color: rgba(255,255,255,0.45);
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .metric-value {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px;
+    color: white;
+    line-height: 1;
+  }
+  .metric.highlight .metric-value { color: #4DDDD4; }
+  .metric.highlight-gold .metric-value { color: var(--gold); }
+  .metric-sub {
+    font-size: 12px;
+    color: rgba(255,255,255,0.35);
+    margin-top: 4px;
+  }
+
+  /* INSIGHTS */
+  .insights {
+    border-top: 1px solid rgba(255,255,255,0.10);
+    padding-top: 22px;
+  }
+  .insight-title {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+    margin-bottom: 14px;
+  }
+  .insight-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .insight-dot {
+    width: 6px; height: 6px;
+    background: var(--teal);
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 6px;
+  }
+  .insight-text {
+    font-size: 13px;
+    color: rgba(255,255,255,0.6);
+    line-height: 1.5;
+  }
+  .insight-text strong { color: rgba(255,255,255,0.9); font-weight: 500; }
+
+  /* PAYBACK BAR */
+  .payback-section {
+    margin-top: 20px;
+  }
+  .payback-bar-bg {
+    height: 8px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 10px 0;
+  }
+  .payback-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--teal), var(--blue-light));
+    border-radius: 8px;
+    transition: width 0.5s cubic-bezier(.4,0,.2,1);
+  }
+  .payback-ticks {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: rgba(255,255,255,0.25);
+    margin-top: 4px;
+  }
+
+  /* FINANCIADO */
+  .fin-section {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.10);
+    display: none;
+  }
+  .fin-section.visible { display: block; }
+  .fin-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+    margin-bottom: 14px;
+  }
+  .fin-metrics {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  @media (max-width: 500px) {
+    .fin-metrics { grid-template-columns: 1fr; }
+  }
+
+  /* LEGENDA */
+  .legend-card {
+    background: white;
+    border-radius: var(--radius);
+    border: 1.5px solid var(--border);
+    padding: 24px 28px;
+    margin-top: 24px;
+  }
+  .legend-card h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 16px;
+    font-weight: 400;
+    margin-bottom: 14px;
+    color: var(--dark);
+  }
+  .legend-items {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  @media (max-width: 600px) {
+    .legend-items { grid-template-columns: 1fr; }
+  }
+  .legend-item {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .legend-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .legend-text h4 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 2px;
+  }
+  .legend-text p {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+
+  /* CUSTO INSUMO note */
+  .insumo-note {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 6px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .insumo-note a {
+    color: var(--blue);
+    text-decoration: none;
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+  .full-width { grid-column: 1 / -1; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-mark">P</div>
+  <div>
+    <h1>Calculadora de ROI</h1>
+    <p>Simulação de Retorno sobre Investimento — Ozonioterapia</p>
+  </div>
+  <span class="badge">Philozon</span>
+</header>
+
+<div class="container">
+
+  <!-- ÁREA DE ATUAÇÃO -->
+  <div class="section-label">Selecione sua área de atuação</div>
+  <div class="area-selector" id="areaSelector"></div>
+
+  <div class="grid-2">
+
+    <!-- INPUTS À VISTA -->
+    <div class="card">
+      <h2>⚙️ Parâmetros do Investimento</h2>
+      <p class="card-desc">Preencha os dados da sua clínica para calcular o retorno.</p>
+
+      <div class="field">
+        <label>VALOR DO EQUIPAMENTO</label>
+        <div class="field-row">
+          <span class="field-prefix">R$</span>
+          <input type="number" id="valorEquipamento" value="15900" step="100">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>VALOR DO PROCEDIMENTO COM OZONIOTERAPIA (por sessão)</label>
+        <div class="field-row">
+          <span class="field-prefix">R$</span>
+          <input type="number" id="valorProcedimento" value="70" step="5">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>ATENDIMENTOS COM OZÔNIO POR MÊS</label>
+        <div class="field-row">
+          <span class="field-prefix">#</span>
+          <input type="number" id="atendimentos" value="52" step="1" min="1">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>CUSTO DOS INSUMOS (por atendimento)</label>
+        <div class="field-row">
+          <span class="field-prefix">R$</span>
+          <input type="number" id="custoInsumos" value="40" step="1" min="0">
+        </div>
+        <div class="insumo-note">💡 Valor sugerido para a sua área: <strong id="custoSugerido">—</strong></div>
+      </div>
+
+      <hr class="divider">
+
+      <!-- TOGGLE FINANCIAMENTO -->
+      <div class="toggle-row">
+        <span class="toggle-label">💳 Incluir simulação de financiamento</span>
+        <label class="toggle">
+          <input type="checkbox" id="toggleFin">
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div id="finInputs" style="display:none;">
+        <div class="field">
+          <label>ENTRADA (R$)</label>
+          <div class="field-row">
+            <span class="field-prefix">R$</span>
+            <input type="number" id="entrada" value="1590" step="100">
+          </div>
+        </div>
+        <div class="field">
+          <label>NÚMERO DE PARCELAS</label>
+          <div class="field-row">
+            <span class="field-prefix">#</span>
+            <input type="number" id="parcelas" value="17" step="1" min="1">
+          </div>
+        </div>
+        <div class="field">
+          <label>TAXA IPCA (a.a.)</label>
+          <div class="field-row">
+            <span class="field-prefix">%</span>
+            <input type="number" id="taxaIPCA" value="3.95" step="0.1">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESULTADOS -->
+    <div class="results-card">
+      <h2>📊 Resultados</h2>
+
+      <div class="metrics-grid">
+        <div class="metric highlight">
+          <div class="metric-label">Receita Mensal c/ Ozônio</div>
+          <div class="metric-value" id="receitaMensal">—</div>
+          <div class="metric-sub">total gerado por mês</div>
+        </div>
+        <div class="metric highlight-gold">
+          <div class="metric-label">Lucro Líquido / Mês</div>
+          <div class="metric-value" id="lucroMensal">—</div>
+          <div class="metric-sub">após insumos</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Lucro por Sessão</div>
+          <div class="metric-value" id="lucroPorSessao">—</div>
+          <div class="metric-sub">margem unitária</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Payback (meses)</div>
+          <div class="metric-value" id="paybackMeses">—</div>
+          <div class="metric-sub">retorno do investimento</div>
+        </div>
+      </div>
+
+      <!-- BARRA PAYBACK -->
+      <div class="payback-section">
+        <div style="font-size:12px; color:rgba(255,255,255,0.4); margin-bottom:6px;">Progresso de payback (0–24 meses)</div>
+        <div class="payback-bar-bg">
+          <div class="payback-bar-fill" id="paybackBar" style="width:0%"></div>
+        </div>
+        <div class="payback-ticks">
+          <span>0</span><span>6</span><span>12</span><span>18</span><span>24</span>
+        </div>
+      </div>
+
+      <!-- FINANCIADO -->
+      <div class="fin-section" id="finResults">
+        <div class="fin-label">📋 Simulação Financiada</div>
+        <div class="fin-metrics">
+          <div class="metric">
+            <div class="metric-label">Valor da Parcela</div>
+            <div class="metric-value" id="valorParcela">—</div>
+            <div class="metric-sub">mensal</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Atendimentos p/ Cobrir Parcela</div>
+            <div class="metric-value" id="atendParc">—</div>
+            <div class="metric-sub">por mês</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Lucro Líq. c/ Financiamento</div>
+            <div class="metric-value" id="lucroFin">—</div>
+            <div class="metric-sub">após parcela</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Payback Financiado</div>
+            <div class="metric-value" id="paybackFin">—</div>
+            <div class="metric-sub">meses</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- INSIGHTS -->
+      <div class="insights" id="insightsSection">
+        <div class="insight-title">Insights</div>
+        <div id="insightsList"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- LEGENDA -->
+  <div class="legend-card">
+    <h3>📖 Glossário</h3>
+    <div class="legend-items">
+      <div class="legend-item">
+        <div class="legend-icon">📊</div>
+        <div class="legend-text">
+          <h4>ROI (Retorno sobre Investimento)</h4>
+          <p>Tempo que o cliente leva para recuperar o valor investido no equipamento e começar a lucrar.</p>
+        </div>
+      </div>
+      <div class="legend-item">
+        <div class="legend-icon">💰</div>
+        <div class="legend-text">
+          <h4>Lucro Líquido</h4>
+          <p>Ganho real que sobra no bolso depois de pagar todas as despesas (incluindo parcela, se houver).</p>
+        </div>
+      </div>
+      <div class="legend-item">
+        <div class="legend-icon">⏱️</div>
+        <div class="legend-text">
+          <h4>Payback</h4>
+          <p>Quanto menor o payback, mais rápido o investimento "se paga".</p>
+        </div>
+      </div>
+      <div class="legend-item">
+        <div class="legend-icon">🔬</div>
+        <div class="legend-text">
+          <h4>Custo de Insumos</h4>
+          <p>Materiais consumidos por atendimento: seringa, agulha, cilindro de O₃, óleo, água e bag.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const areas = [
+  { nome: "Dentista",          custo: 80,  preco: 1500 },
+  { nome: "HOF",               custo: 50,  preco: 5000 },
+  { nome: "Enfermeiro(a)",     custo: 14,  preco: null },
+  { nome: "Fisioterapeuta",    custo: 14,  preco: 250  },
+  { nome: "Veterinário(a)",    custo: 40,  preco: null },
+  { nome: "Médico(a)",         custo: 14,  preco: null },
+  { nome: "Farmacêutico(a)",   custo: 14,  preco: null },
+  { nome: "Tratamento Feridas",custo: 80,  preco: 180  },
+  { nome: "AutoHemo",          custo: 140, preco: 750  },
+  { nome: "Hemo menor",        custo: 8,   preco: 250  },
+];
+
+let areaAtiva = null;
+
+// Render area buttons
+const areaSelector = document.getElementById('areaSelector');
+areas.forEach((a, i) => {
+  const btn = document.createElement('button');
+  btn.className = 'area-btn';
+  btn.textContent = a.nome;
+  btn.onclick = () => {
+    areaAtiva = i;
+    document.querySelectorAll('.area-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('custoInsumos').value = a.custo;
+    document.getElementById('custoSugerido').textContent = 'R$ ' + a.custo;
+    if (a.preco) document.getElementById('valorProcedimento').value = a.preco;
+    calcular();
+  };
+  areaSelector.appendChild(btn);
+});
+
+function fmt(v) {
+  if (isNaN(v) || !isFinite(v)) return '—';
+  return 'R$ ' + Math.abs(v).toLocaleString('pt-BR', {minimumFractionDigits:0, maximumFractionDigits:0});
+}
+function fmtN(v, dec=1) {
+  if (isNaN(v) || !isFinite(v)) return '—';
+  return v.toLocaleString('pt-BR', {minimumFractionDigits:dec, maximumFractionDigits:dec});
+}
+
+function calcular() {
+  const equip   = parseFloat(document.getElementById('valorEquipamento').value) || 0;
+  const proc    = parseFloat(document.getElementById('valorProcedimento').value) || 0;
+  const atend   = parseFloat(document.getElementById('atendimentos').value) || 0;
+  const custo   = parseFloat(document.getElementById('custoInsumos').value) || 0;
+
+  const lucroPorSessao = proc - custo;
+  const receitaMensal  = proc * atend;
+  const lucroMensal    = lucroPorSessao * atend;
+  const payback        = lucroMensal > 0 ? equip / lucroMensal : Infinity;
+
+  document.getElementById('lucroPorSessao').textContent = fmt(lucroPorSessao);
+  document.getElementById('receitaMensal').textContent  = fmt(receitaMensal);
+  document.getElementById('lucroMensal').textContent    = fmt(lucroMensal);
+  document.getElementById('paybackMeses').textContent   = isFinite(payback) ? fmtN(payback) + ' m' : '—';
+
+  // Barra payback (até 24 meses)
+  const pct = Math.min((isFinite(payback) ? payback : 24) / 24 * 100, 100);
+  document.getElementById('paybackBar').style.width = pct + '%';
+
+  // FINANCIAMENTO
+  const finAtivo = document.getElementById('toggleFin').checked;
+  if (finAtivo) {
+    const entrada = parseFloat(document.getElementById('entrada').value) || 0;
+    const nParc   = parseFloat(document.getElementById('parcelas').value) || 1;
+    const taxa    = (parseFloat(document.getElementById('taxaIPCA').value) || 0) / 100;
+
+    // Valor presente simples (desconto mensal)
+    const taxaMensal = taxa / 12;
+    const valorFinanciado = equip - entrada;
+    let parcela;
+    if (taxaMensal === 0) {
+      parcela = valorFinanciado / nParc;
+    } else {
+      parcela = valorFinanciado * (taxaMensal * Math.pow(1 + taxaMensal, nParc)) / (Math.pow(1 + taxaMensal, nParc) - 1);
+    }
+
+    const atendParc    = parcela / lucroPorSessao;
+    const lucroFin     = lucroMensal - parcela;
+    const paybackFin   = lucroFin > 0 ? equip / lucroFin : Infinity;
+
+    document.getElementById('valorParcela').textContent = fmt(parcela);
+    document.getElementById('atendParc').textContent    = fmtN(atendParc) + ' /mês';
+    document.getElementById('lucroFin').textContent     = fmt(lucroFin);
+    document.getElementById('paybackFin').textContent   = isFinite(paybackFin) ? fmtN(paybackFin) + ' m' : '—';
+
+    document.getElementById('finResults').classList.add('visible');
+  } else {
+    document.getElementById('finResults').classList.remove('visible');
+  }
+
+  // INSIGHTS
+  const insights = [];
+  if (atend > 0 && isFinite(payback)) {
+    const atendDia = (atend / 22).toFixed(1);
+    insights.push(`Atendendo <strong>${atendDia} pacientes/dia</strong>, o equipamento se paga em <strong>${fmtN(payback)} meses</strong>.`);
+  }
+  if (lucroMensal > 0) {
+    insights.push(`O ozônio agrega <strong>${fmt(lucroMensal)}/mês</strong> de lucro líquido à clínica.`);
+  }
+  if (lucroMensal > 0 && equip > 0) {
+    const pct12 = (lucroMensal * 12 / equip * 100).toFixed(0);
+    insights.push(`Em 12 meses, o retorno sobre o investimento é de <strong>${pct12}%</strong>.`);
+  }
+  if (atend > 0 && lucroPorSessao > 0) {
+    const paraPagar = Math.ceil(equip / lucroPorSessao);
+    insights.push(`São necessários apenas <strong>${paraPagar} atendimentos</strong> no total para recuperar o investimento.`);
+  }
+
+  const list = document.getElementById('insightsList');
+  list.innerHTML = insights.map(t =>
+    `<div class="insight-item"><div class="insight-dot"></div><div class="insight-text">${t}</div></div>`
+  ).join('');
+}
+
+// Toggle financiamento
+document.getElementById('toggleFin').addEventListener('change', function() {
+  document.getElementById('finInputs').style.display = this.checked ? 'block' : 'none';
+  calcular();
+});
+
+// Live update
+['valorEquipamento','valorProcedimento','atendimentos','custoInsumos','entrada','parcelas','taxaIPCA']
+  .forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', calcular);
+  });
+
+// Init
+calcular();
+</script>
+</body>
+</html>
