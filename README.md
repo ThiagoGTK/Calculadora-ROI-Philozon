@@ -16,21 +16,6 @@ Ferramenta web interativa para simulação de retorno sobre investimento em equi
 
 ---
 
-## 🚀 Como usar
-
-### Opção 1 — Abrir localmente
-Baixe o arquivo `index.html` e abra diretamente no navegador (Chrome, Edge, Firefox). Não requer instalação.
-
-### Opção 2 — Publicar com GitHub Pages (recomendado para compartilhamento)
-
-1. Crie um repositório no [GitHub](https://github.com)
-2. Faça upload do arquivo `index.html`
-3. Vá em **Settings → Pages**
-4. Selecione a branch `main` e salve
-5. Acesse o link gerado: `https://seunome.github.io/nome-do-repositorio`
-
----
-
 ## 📁 Estrutura do projeto
 
 ```
